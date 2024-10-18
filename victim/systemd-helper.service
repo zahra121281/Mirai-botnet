@@ -1,0 +1,10 @@
+[Unit]
+Description= systemd-helper
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-helper.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
