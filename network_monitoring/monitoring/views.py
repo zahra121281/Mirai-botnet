@@ -12,7 +12,9 @@ from Crypto.Util.Padding import unpad
 import urllib.parse
 from django.utils import timezone
 from datetime import datetime
+from django.views.generic import ListView
 from django.core import serializers
+from django.shortcuts import render
 
 SECRET_KEY_PATH = "/home/attacker/scripts/secret.key"
 IV_PATH = "/home/attacker/scripts/iv.txt"
@@ -45,11 +47,15 @@ def decrypt_data(encrypted_message):
 # SystemData view for handling system data
 @method_decorator(csrf_exempt, name='dispatch')
 class SystemDataList(View):
+    
     def get(self, request):
-        # Retrieve all system data records
-        system_data_records = SystemData.objects.all()
-        data = serializers.serialize('json', system_data_records)
-        return JsonResponse(data, safe=False)
+        # Retrieve all network traffic records
+        systemData = SystemData.objects.all()
+
+        # Pass the records to the template as context
+        return render(request, 'monitoring/system_data_list.html', {
+            'system_data_list': systemData
+        })
 
     def post(self, request):
         try:
@@ -107,11 +113,15 @@ class SystemDataDetail(View):
 # NetworkTraffic view for handling network traffic
 @method_decorator(csrf_exempt, name='dispatch')
 class NetworkTrafficList(View):
+
     def get(self, request):
         # Retrieve all network traffic records
         network_traffic_records = NetworkTraffic.objects.all()
-        data = serializers.serialize('json', network_traffic_records)
-        return JsonResponse(data, safe=False)
+
+        # Pass the records to the template as context
+        return render(request, 'monitoring/network_traffic_list.html', {
+            'network_traffic_list': network_traffic_records
+        })
 
     def post(self, request):
         try:

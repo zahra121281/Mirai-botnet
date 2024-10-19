@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Data</title>
+    <style>
+        /* Optional styling for the tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>System Data List</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Hostname</th>
+                <th>OS Info</th>
+                <th>Kernel Version</th>
+                <th>Architecture</th>
+                <th>Users</th>
+                <th>IP Addresses</th>
+                <th>CPU Info</th>
+                <th>Memory Info</th>
+                <th>Disk Usage</th>
+                <th>USB Devices</th>
+                <th>System Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in system_data_list %}
+            <tr>
+                <td>{{ data.hostname }}</td>
+                <td>
+                    <div class="os-info" data-os-info="{{ data.os_info }}"></div>
+                </td>
+                <td>{{ data.kernel_version }}</td>
+                <td>{{ data.architecture }}</td>
+                <td>{{ data.users }}</td>
+                <td>{{ data.ip_addresses }}</td>
+                <td>{{ data.cpu_info }}</td>
+                <td>{{ data.memory_info }}</td>
+                <td>{{ data.disk_usage }}</td>
+                <td>{{ data.usb_devices }}</td>
+                <td>{{ data.system_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Select all elements with the class "os-info"
+        const osInfoElements = document.querySelectorAll('.os-info');
+
+        osInfoElements.forEach(element => {
+            const osInfo = element.getAttribute('data-os-info');
+
+            // Check if osInfo is not null or empty
+            if (osInfo) {
+                const osInfoPairs = osInfo.split(' ').map(item => {
+                    const [key, value] = item.split('=');
+
+                    // Ensure key and value exist
+                    if (key && value) {
+                        return { key, value: value.replace(/(^"|"$)/g, '') }; // Remove surrounding quotes if any
+                    } else {
+                        return null; // Return null for invalid pairs
+                    }
+                }).filter(pair => pair !== null); // Filter out invalid pairs
+
+                // Create a new table for OS info
+                const osTable = document.createElement('table');
+                const osTbody = document.createElement('tbody');
+
+                osInfoPairs.forEach(pair => {
+                    const tr = document.createElement('tr');
+                    const tdKey = document.createElement('td');
+                    const tdValue = document.createElement('td');
+
+                    tdKey.innerText = pair.key;
+                    tdValue.innerText = pair.value;
+
+                    // Optional: style the cells
+                    tdKey.style.border = '1px solid #ccc';
+                    tdValue.style.border = '1px solid #ccc';
+                    tdKey.style.padding = '8px';
+                    tdValue.style.padding = '8px';
+
+                    tr.appendChild(tdKey);
+                    tr.appendChild(tdValue);
+                    osTbody.appendChild(tr);
+                });
+
+                osTable.appendChild(osTbody);
+                element.appendChild(osTable);
+            } else {
+                // Handle case where osInfo is empty or null
+                element.innerText = "No OS info available";
+            }
+        });
+    </script>
+
+</body>
+
+</html>

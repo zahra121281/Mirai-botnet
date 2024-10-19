@@ -59,7 +59,7 @@ ROOT_URLCONF = 'network_monitoring.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,7 +73,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'network_monitoring.wsgi.application'
-
+TEMPLATE_DIR = os.path.join(BASE_DIR,"templates")
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

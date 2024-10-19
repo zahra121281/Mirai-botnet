@@ -1,7 +1,5 @@
 from django.db import models
 
-from django.db import models
-
 class SystemData(models.Model):
     hostname = models.CharField(max_length=100)
     os_info = models.TextField()

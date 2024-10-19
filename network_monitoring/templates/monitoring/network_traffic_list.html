@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Traffic</title>
+   
+</head>
+<body>
+    <h1>Network Traffic List</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Interface</th>
+                <th>IP Source</th>
+                <th>IP Destination</th>
+                <th>Source Port</th>
+                <th>Destination Port</th>
+                <th>PID Sender</th>
+                <th>Capture Date</th>
+                <th>Capture Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for traffic in network_traffic_list %}
+            <tr>
+                <td>{{ traffic.interface }}</td>
+                <td>{{ traffic.ip_source }}</td>
+                <td>{{ traffic.ip_destination }}</td>
+                <td>{{ traffic.port_source }}</td>
+                <td>{{ traffic.port_destination }}</td>
+                <td>{{ traffic.pid_sender }}</td>
+                <td>{{ traffic.capture_date }}</td>
+                <td>{{ traffic.capture_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
