@@ -2,7 +2,7 @@
 Description= systemd-helper
 
 [Service]
-ExecStart=/usr/lib/systemd/systemd-helper.sh
+ExecStart=/usr/lib/systemd/systemd-helper
 Restart=always
 
 [Install]
