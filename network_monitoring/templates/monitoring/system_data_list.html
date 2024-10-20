@@ -6,24 +6,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Data</title>
     <style>
-        /* Optional styling for the tables */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            transition: width 0.3s ease, font-size 0.3s ease, padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            width: 96vw;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #f0f0f0;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            transition: font-size 0.3s ease;
+        }
+
+        body.dark-mode h1 {
+            color: #e0e0e0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        body.dark-mode table {
+            background-color: #1e1e1e;
         }
 
         th,
         td {
-            border: 1px solid #ccc;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
             text-align: left;
+            font-size: 14px;
+            transition: font-size 0.3s ease, padding 0.3s ease;
+        }
+
+        body.dark-mode th,
+        body.dark-mode td {
+            border-color: #333;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        body.dark-mode th {
+            background-color: #444;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        body.dark-mode tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            transition: background-color 0.2s ease;
+        }
+
+        body.dark-mode tr:hover {
+            background-color: #333;
+        }
+
+        td {
+            word-wrap: break-word;
+        }
+
+        td[data-os-info],
+        td[data-cpu-info],
+        td[data-memory-info],
+        td[data-disk-usage],
+        td[data-usb-devices] {
+            font-size: 12px;
+            color: #2c3e50;
+        }
+
+        body.dark-mode td[data-os-info],
+        body.dark-mode td[data-cpu-info],
+        body.dark-mode td[data-memory-info],
+        body.dark-mode td[data-disk-usage],
+        body.dark-mode td[data-usb-devices] {
+            color: #f0f0f0;
+        }
+
+        td hr {
+            border: none;
+            height: 1px;
+            background-color: #e1e1e1;
+            margin: 6px 0;
+        }
+
+        body.dark-mode td hr {
+            background-color: #444;
+        }
+
+        .btn-container {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: padding 0.3s ease, font-size 0.3s ease;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #3498db;
+        }
+
+        body.dark-mode button {
+            background-color: #444;
+        }
+
+        body.dark-mode button:hover {
+            background-color: #555;
         }
     </style>
 </head>
 
 <body>
+    <div class="btn-container">
+        <button id="toggle-btn" onclick="toggleWidth()">Expand Width</button>
+        <button id="dark-mode-btn" onclick="toggleDarkMode()">Dark Mode</button>
+    </div>
+
     <h1>System Data List</h1>
+
     <table border="1">
         <thead>
             <tr>
@@ -43,18 +181,16 @@
         <tbody>
             {% for data in system_data_list %}
             <tr>
-                <td>{{ data.hostname }}</td>
-                <td>
-                    <div class="os-info" data-os-info="{{ data.os_info }}"></div>
-                </td>
+                <td style="text-align: center;">{{ data.hostname }}</td>
+                <td id="os-info-{{ forloop.counter }}" data-os-info="{{ data.os_info | escape }}"></td>
                 <td>{{ data.kernel_version }}</td>
                 <td>{{ data.architecture }}</td>
                 <td>{{ data.users }}</td>
                 <td>{{ data.ip_addresses }}</td>
-                <td>{{ data.cpu_info }}</td>
-                <td>{{ data.memory_info }}</td>
-                <td>{{ data.disk_usage }}</td>
-                <td>{{ data.usb_devices }}</td>
+                <td id="cpu-info-{{ forloop.counter }}" data-cpu-info="{{ data.cpu_info | escape }}"></td>
+                <td id="memory-info-{{ forloop.counter }}" data-memory-info="{{ data.memory_info | escape }}"></td>
+                <td id="disk-usage-{{ forloop.counter }}" data-disk-usage="{{ data.disk_usage | escape }}"></td>
+                <td id="usb-devices-{{ forloop.counter }}" data-usb-devices="{{ data.usb_devices | escape }}"></td>
                 <td>{{ data.system_time }}</td>
             </tr>
             {% endfor %}
@@ -62,57 +198,79 @@
     </table>
 
     <script>
-        // Select all elements with the class "os-info"
-        const osInfoElements = document.querySelectorAll('.os-info');
+        function toggleWidth() {
+            const body = document.body;
+            const button = document.getElementById('toggle-btn');
+            const h1 = document.querySelector('h1');
+            const tds = document.querySelectorAll('td, th');
+            const buttonStyle = button.style;
 
-        osInfoElements.forEach(element => {
-            const osInfo = element.getAttribute('data-os-info');
+            if (body.style.width === "180vw") {
+                body.style.width = "96vw";
+                button.textContent = "Expand Width";
+                h1.style.fontSize = "24px";
 
-            // Check if osInfo is not null or empty
-            if (osInfo) {
-                const osInfoPairs = osInfo.split(' ').map(item => {
-                    const [key, value] = item.split('=');
-
-                    // Ensure key and value exist
-                    if (key && value) {
-                        return { key, value: value.replace(/(^"|"$)/g, '') }; // Remove surrounding quotes if any
-                    } else {
-                        return null; // Return null for invalid pairs
-                    }
-                }).filter(pair => pair !== null); // Filter out invalid pairs
-
-                // Create a new table for OS info
-                const osTable = document.createElement('table');
-                const osTbody = document.createElement('tbody');
-
-                osInfoPairs.forEach(pair => {
-                    const tr = document.createElement('tr');
-                    const tdKey = document.createElement('td');
-                    const tdValue = document.createElement('td');
-
-                    tdKey.innerText = pair.key;
-                    tdValue.innerText = pair.value;
-
-                    // Optional: style the cells
-                    tdKey.style.border = '1px solid #ccc';
-                    tdValue.style.border = '1px solid #ccc';
-                    tdKey.style.padding = '8px';
-                    tdValue.style.padding = '8px';
-
-                    tr.appendChild(tdKey);
-                    tr.appendChild(tdValue);
-                    osTbody.appendChild(tr);
+                // Reset padding and font size
+                tds.forEach(td => {
+                    td.style.fontSize = "14px";
+                    td.style.padding = "10px";
                 });
-
-                osTable.appendChild(osTbody);
-                element.appendChild(osTable);
+                buttonStyle.padding = "10px 20px";
+                buttonStyle.fontSize = "14px";
             } else {
-                // Handle case where osInfo is empty or null
-                element.innerText = "No OS info available";
+                body.style.width = "180vw";
+                button.textContent = "Shrink Width";
+                h1.style.fontSize = "32px";
+
+                // Increase padding and font size
+                tds.forEach(td => {
+                    td.style.fontSize = "16px";
+                    td.style.padding = "12px";
+                });
+                buttonStyle.padding = "12px 24px";
+                buttonStyle.fontSize = "16px";
             }
+        }
+
+        function toggleDarkMode() {
+            const body = document.body;
+            const darkModeButton = document.getElementById('dark-mode-btn');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                darkModeButton.textContent = "Light Mode";
+            } else {
+                darkModeButton.textContent = "Dark Mode";
+            }
+        }
+
+        document.querySelectorAll('td[data-os-info]').forEach(function (td) {
+            let osInfo = td.getAttribute('data-os-info');
+            let formattedOsInfo = osInfo.split('\n').join('<hr>');
+            td.innerHTML = formattedOsInfo;
+        });
+        document.querySelectorAll('td[data-cpu-info]').forEach(function (td) {
+            let cpuInfo = td.getAttribute('data-cpu-info');
+            let formattedCpuInfo = cpuInfo.split('\n').join('<hr>');
+            td.innerHTML = formattedCpuInfo;
+        });
+        document.querySelectorAll('td[data-memory-info]').forEach(function (td) {
+            let memoryInfo = td.getAttribute('data-memory-info');
+            let formattedmemoryInfo = memoryInfo.split('\n').join('<hr>');
+            td.innerHTML = formattedmemoryInfo;
+        });
+        document.querySelectorAll('td[data-disk-usage]').forEach(function (td) {
+            let diskUsage = td.getAttribute('data-disk-usage');
+            let formatteddiskUsage = diskUsage.split('\n').join('<hr>');
+            td.innerHTML = formatteddiskUsage;
+        });
+        document.querySelectorAll('td[data-usb-devices]').forEach(function (td) {
+            let usbDevices = td.getAttribute('data-usb-devices');
+            let formattedusbDevices = usbDevices.split('\n').join('<hr>');
+            td.innerHTML = formattedusbDevices;
         });
     </script>
-
 </body>
 
 </html>
