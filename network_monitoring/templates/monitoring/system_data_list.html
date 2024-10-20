@@ -12,8 +12,7 @@
             color: #333;
             margin: 0;
             padding: 20px;
-            transition: width 0.3s ease, font-size 0.3s ease, padding 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-            width: 96vw;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         body.dark-mode {
@@ -26,7 +25,6 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 24px;
-            transition: font-size 0.3s ease;
         }
 
         body.dark-mode h1 {
@@ -128,6 +126,16 @@
             left: 20px;
         }
 
+        .btn-container>button:last-of-type {
+            display: none;
+        }
+
+        .nav-btn-container {
+            position: absolute;
+            top: 30px;
+            right: 20px;
+        }
+
         button {
             padding: 10px 20px;
             background-color: #2980b9;
@@ -158,6 +166,14 @@
     <div class="btn-container">
         <button id="toggle-btn" onclick="toggleWidth()">Expand Width</button>
         <button id="dark-mode-btn" onclick="toggleDarkMode()">Dark Mode</button>
+        <button id="leftside-nav-btn" onclick="window.location.href='http://127.0.0.1:8000/api/network-traffic/'">Go to
+            Network
+            Traffic</button>
+    </div>
+
+    <div id="rightside-nav-btn" class="nav-btn-container">
+        <button onclick="window.location.href='http://127.0.0.1:8000/api/network-traffic/'">Go to Network
+            Traffic</button>
     </div>
 
     <h1>System Data List</h1>
@@ -201,6 +217,8 @@
         function toggleWidth() {
             const body = document.body;
             const button = document.getElementById('toggle-btn');
+            const leftNavButton = document.getElementById('leftside-nav-btn');
+            const rightNavButton = document.getElementById('rightside-nav-btn');
             const h1 = document.querySelector('h1');
             const tds = document.querySelectorAll('td, th');
             const buttonStyle = button.style;
@@ -209,6 +227,8 @@
                 body.style.width = "96vw";
                 button.textContent = "Expand Width";
                 h1.style.fontSize = "24px";
+                leftNavButton.style.display = "none";
+                rightNavButton.style.display = "initial";
 
                 // Reset padding and font size
                 tds.forEach(td => {
@@ -221,6 +241,8 @@
                 body.style.width = "180vw";
                 button.textContent = "Shrink Width";
                 h1.style.fontSize = "32px";
+                rightNavButton.style.display = "none";
+                leftNavButton.style.display = "initial";
 
                 // Increase padding and font size
                 tds.forEach(td => {
@@ -235,9 +257,9 @@
         function toggleDarkMode() {
             const body = document.body;
             const darkModeButton = document.getElementById('dark-mode-btn');
-            
+
             body.classList.toggle('dark-mode');
-            
+
             if (body.classList.contains('dark-mode')) {
                 darkModeButton.textContent = "Light Mode";
             } else {

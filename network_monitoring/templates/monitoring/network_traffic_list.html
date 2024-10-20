@@ -25,7 +25,6 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 24px;
-            transition: font-size 0.3s ease;
         }
 
         body.dark-mode h1 {
@@ -93,38 +92,16 @@
             word-wrap: break-word;
         }
 
-        td[data-ip-source],
-        td[data-ip-destination],
-        td[data-port-source],
-        td[data-port-destination],
-        td[data-pid-sender] {
-            font-size: 12px;
-            color: #2c3e50;
-        }
-
-        body.dark-mode td[data-ip-source],
-        body.dark-mode td[data-ip-destination],
-        body.dark-mode td[data-port-source],
-        body.dark-mode td[data-port-destination],
-        body.dark-mode td[data-pid-sender] {
-            color: #f0f0f0;
-        }
-
-        td hr {
-            border: none;
-            height: 1px;
-            background-color: #e1e1e1;
-            margin: 6px 0;
-        }
-
-        body.dark-mode td hr {
-            background-color: #444;
-        }
-
         .btn-container {
             position: absolute;
             top: 30px;
             left: 20px;
+        }
+
+        .nav-btn-container {
+            position: absolute;
+            top: 30px;
+            right: 20px;
         }
 
         button {
@@ -156,6 +133,10 @@
 <body>
     <div class="btn-container">
         <button id="dark-mode-btn" onclick="toggleDarkMode()">Dark Mode</button>
+    </div>
+
+    <div class="nav-btn-container">
+        <button onclick="window.location.href='http://127.0.0.1:8000/api/system-data/'">Go to System Data</button>
     </div>
 
     <h1>Network Traffic List</h1>
