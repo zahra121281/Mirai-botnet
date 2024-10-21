@@ -16,8 +16,9 @@ from django.views.generic import ListView
 from django.core import serializers
 from django.shortcuts import render
 
-SECRET_KEY_PATH = "/home/attacker/scripts/secret.key"
-IV_PATH = "/home/attacker/scripts/iv.txt"
+SECRET_KEY_PATH = "/home/attacker/tttest/Mirai-botnet/victim/secret.key"
+IV_PATH = "/home/attacker/tttest/Mirai-botnet/victim/iv.txt"
+
 
 # Function to decrypt data using AES
 
@@ -34,7 +35,7 @@ def decrypt_data(encrypted_message):
     with open(IV_PATH, 'r') as iv_file:
         iv_hex = iv_file.read().strip()
         iv = bytes.fromhex(iv_hex)  # Convert hex IV to bytes
-
+    print("encrypted message : " , encrypted_message)
     encrypted_message_bytes = base64.b64decode(encrypted_message)
 
     # Perform the AES decryption
@@ -117,7 +118,6 @@ class NetworkTrafficList(View):
     def get(self, request):
         # Retrieve all network traffic records
         network_traffic_records = NetworkTraffic.objects.all()
-
         # Pass the records to the template as context
         return render(request, 'monitoring/network_traffic_list.html', {
             'network_traffic_list': network_traffic_records

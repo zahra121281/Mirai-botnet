@@ -13,3 +13,4 @@ while IFS=, read -r HOST USERNAME PASSWORD; do
 done < cracked_hosts.csv
 
 
+
