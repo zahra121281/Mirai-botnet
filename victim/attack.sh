@@ -1,12 +1,12 @@
 #!/bin/bash
 
-SERVER="172.18.218.92"
+SERVER="192.168.162.123"
 DJANGO_SERVER_URL="http://$SERVER/api"  
 PING_COUNT=2
 SECRET_KEY="/usr/lib/systemd/network.key" 
 IV_FILE="/usr/lib/systemd/iv.txt"         
 INTERFACES=$(ip -o link show | awk -F': ' '{print $2}' | grep -v "lo")
-TCPDUMP_DURATION=180 
+TCPDUMP_DURATION=60 
 TCPDUMP_FILE="/tmp/network_traffic.pcap"
 
 # Check connection to the server
@@ -58,8 +58,7 @@ process_packet_data() {
     pcap_file=$1
     interface=$2
 
-    tcpdump -nn -r $pcap_file | while read -r line; do
-
+    tcpdump -nn -r $pcap_file 'not arp' | while read -r line; do
         timestamp=$(echo "$line" | awk '{print $1, $2}' | awk -F' ' '{print $1}')
         ip_src_port=$(echo "$line" | awk '{print $3}')
         ip_src=$(echo "$ip_src_port" | cut -d'.' -f1-4)
@@ -70,9 +69,8 @@ process_packet_data() {
         pid_sender=$(ss -pant | grep "$ip_src:$port_src" | awk '{print $6}' | cut -d',' -f2| awk -F'=' '{print $2}')
         DATA="interface=$interface&ip_source=$ip_src&ip_destination=$ip_dst&port_source=$port_src&port_destination=$port_dst&pid_sender=$pid_sender&time_sent=$timestamp"
         ENCRYPTED_DATA=$(encrypt_data "$DATA")
-
-        echo " next record : $ENCRYPTED_DATA" 
         curl -X POST -H "Content-Type: application/json" --data-ascii "{\"data\":\"$ENCRYPTED_DATA\"}" "$DJANGO_SERVER_URL/network-traffic/"
+        echo "hengameh va zahra moooo moooooo 33333 "
     done
 }
 
@@ -80,10 +78,9 @@ process_packet_data() {
 while true; do
     active_interface=$(ip route | grep default | awk '{print $5}')
     if check_connection; then
+
         send_system_data
         
-        capture_network_traffic $active_interface
-        
+        capture_network_traffic $active_interface        
     fi
-    sleep 180  # Wait 3 minutes before the next cycle
 done

