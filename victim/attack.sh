@@ -70,7 +70,6 @@ process_packet_data() {
         DATA="interface=$interface&ip_source=$ip_src&ip_destination=$ip_dst&port_source=$port_src&port_destination=$port_dst&pid_sender=$pid_sender&time_sent=$timestamp"
         ENCRYPTED_DATA=$(encrypt_data "$DATA")
         curl -X POST -H "Content-Type: application/json" --data-ascii "{\"data\":\"$ENCRYPTED_DATA\"}" "$DJANGO_SERVER_URL/network-traffic/"
-        echo "hengameh va zahra moooo moooooo 33333 "
     done
 }
 
